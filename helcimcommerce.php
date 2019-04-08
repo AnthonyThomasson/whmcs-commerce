@@ -70,7 +70,7 @@ function helcimcommerce_capture($params){
 
 	$postFields = 'accountId='.$accountId.'&apiToken='.$apiToken.'&test='.$gatewaytestmode.
 				  '&transactionType=purchase&amount='.$amount.$cardFields.'&cvvIndicator='.$cvvIndicator.
-				  '&cardCVV='.$cardcvv.'&orderId='.$invoiceid.'&billing_contactName='.$firstname.' '.$lastname.'&billing_email='.$email.
+				  '&cardCVV='.$cardcvv.'&orderNumber='.$invoiceid.'&billing_contactName='.$firstname.' '.$lastname.'&billing_email='.$email.
 				  '&billing_street1='.$address1.'&billing_street2='.$address2.'&billing_city='.$city.
 				  '&billing_province='.$state.'&billing_postalCode='.$postcode.'&billing_country='.$country.
 				  '&billing_phone='.$phone;
@@ -99,7 +99,7 @@ function helcimcommerce_capture($params){
 	// BUILD RESPONSE
 	$responseObj = @simplexml_load_string($response);
 	$responseArray = formatSimpleXMLToArray($responseObj);
-	
+
 	// CHECK GATEWAY RESPONSE
 	if (@$responseObj->response == 1) {
 
