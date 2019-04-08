@@ -56,7 +56,7 @@ function helcimcommerce_capture($params){
 		$cardexpiry = $params['cardexp']; // FORMAT: MMYY
 		$cardstart = $params['cardstart']; // FORMAT: MMYY
 		$cardissuenum = $params['cardissuenum'];
-		$cardcvv = $params["cccvv"];
+		$cardcvv = $params["cardcvv"];
 		if (!$cardcvv)
 			$cvvIndicator = 4;
 	}
@@ -70,7 +70,7 @@ function helcimcommerce_capture($params){
 
 	$postFields = 'accountId='.$accountId.'&apiToken='.$apiToken.'&test='.$gatewaytestmode.
 				  '&transactionType=purchase&amount='.$amount.$cardFields.'&cvvIndicator='.$cvvIndicator.
-				  '&cardCVV='.$cardcvv.'&orderId='.$invoiceid.'&billing_contactName='.$firstname.' '.$lastname.'&billing_email='.$email.
+				  '&cardCVV='.$cardcvv.'&orderNumber='.$invoiceid.'&billing_contactName='.$firstname.' '.$lastname.'&billing_email='.$email.
 				  '&billing_street1='.$address1.'&billing_street2='.$address2.'&billing_city='.$city.
 				  '&billing_province='.$state.'&billing_postalCode='.$postcode.'&billing_country='.$country.
 				  '&billing_phone='.$phone;
@@ -104,14 +104,14 @@ function helcimcommerce_capture($params){
 	if (@$responseObj->response == 1) {
 
 		// TRANSACTION COMPLETED SUCCESSFULLY
-		
+
 		// UPDATE TOKEN
 		$table = "tblclients";
-		$update = array("gatewayid"=>$responseArray['cardToken'].';'.str_replace('*', '', $responseArray['cardNumber']));
+		$update = array("gatewayid"=>$responseArray['transaction']['cardToken'].';'.str_replace('*', '', $responseArray['transaction']['cardNumber']));
 		$where = array("id"=>$clientid);
 		update_query($table,$update,$where);
 
-		return array("status"=>"success","transid"=>$responseArray["transactionId"],"rawdata"=>$responseArray);
+		return array("status"=>"success","transid"=>$responseArray['transaction']["transactionId"],"rawdata"=>$responseArray);
 	}else{
 
 		// TRANSACTION DECLINED
@@ -203,7 +203,7 @@ function helcimcommerce_refund($params) {
 	if ($responseObj->response == 1) {
 
 		// TRANSACTION COMPLETED SUCCESSFULLY
-		return array("status"=>"success","transid"=>$responseArray["transactionId"],"rawdata"=>$responseArray);
+		return array("status"=>"success","transid"=>$responseArray['transaction']["transactionId"],"rawdata"=>$responseArray);
 	
 	}else{
 
@@ -245,12 +245,12 @@ function helcimcommerce_storeremote($params){
 	$cardexpiry = $params['cardexp']; // FORMAT: MMYY
 	$cardstart = $params['cardstart']; // FORMAT: MMYY
 	$cardissuenum = $params['cardissuenum'];
-	$cardcvv = $params["cccvv"];
+	$cardcvv = $params["cardcvv"];
 
 	$cardFields = '&cardNumber='.$cardnumber.'&cardExpiry='.$cardexpiry;
 
 	$postFields = 'accountId='.$accountId.'&apiToken='.$apiToken.'&test='.$gatewaytestmode.
-				  '&transactionType=preauth&allowZeroAmount=1&amount=0'.$amount.$cardFields.'&cvvIndicator='.$cvvIndicator.
+				  '&transactionType=verify&amount=0'.$cardFields.'&cvvIndicator='.$cvvIndicator.
 				  '&cardCVV='.$cardcvv.'&billing_contactName='.$firstname.' '.$lastname.'&billin g_email='.$email.
 				  '&billing_street1='.$address1.'&billing_street2='.$address2.'&billing_city='.$city.
 				  '&billing_province='.$state.'&billing_postalCode='.$postcode.'&billing_country='.$country.
@@ -285,7 +285,7 @@ function helcimcommerce_storeremote($params){
 	if ($responseObj->response == 1){
 
 		// TRANSACTION COMPLETED SUCCESSFULLY
-		$gatewayid = $responseArray['cardToken'].';'.str_replace('*', '', $responseArray['cardNumber']);
+		$gatewayid = $responseArray['transaction']['cardToken'].';'.str_replace('*', '', $responseArray['transaction']['cardNumber']);
 		return array("status"=>"success","gatewayid"=>$gatewayid,"rawdata"=>$responseArray);
 	
 	}else{
